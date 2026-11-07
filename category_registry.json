@@ -5,8 +5,8 @@
   "mappings": {
     "311": {
       "category_id": "311",
-      "source": "Official category number supplied by seller and Bazar.bg sample bazar-import-311.xml",
-      "description": "Category used for Saint + Sinner men's winter coat listing",
+      "source": "Bazar.bg public men's jackets listing and official bazar-import-311.xml example",
+      "description": "Мъжки дрехи → Якета",
       "example_fields": [
         "external_id",
         "title",
@@ -29,18 +29,20 @@
         "auto_renew"
       ],
       "known_input_format": {
-        "sizes": "Text label(s), e.g. XS|S in example; size L still needs category validation",
+        "sizes": "The category supports L; sample XML uses text labels (XS|S).",
         "province_id": "Location name accepted by platform according to Bazar import UI",
-        "city_id": "Location name accepted by platform according to Bazar import UI"
+        "city_id": "Location name accepted by platform according to Bazar import UI",
+        "type": "215 (Зимни), confirmed in the public filter and XML sample.",
+        "condition": "1 (Ново), confirmed in the public filter and XML sample."
       },
       "verification_status": "partial",
       "pending_checks": [
-        "Correct allowed value for type",
-        "Whether condition=1 means new",
-        "Photo XML structure for multiple URLs",
-        "Seller profile contact/location fallback",
-        "Import validation on Bazar.bg"
-      ]
+        "Exact images XML format for multiple URLs",
+        "Meanings and requirements for delivery, price_type, and allow_offers",
+        "Seller profile contact/location fallback for automatic feed",
+        "Automatic import validation and Premium status"
+      ],
+      "public_category_url": "https://bazar.bg/obiavi/iaketa-palta?vip=1"
     }
   }
 }
