@@ -1,58 +1,65 @@
-name: Build approved Bazar.bg feed
+name: Build and deploy Bazar AI Feed
 
 on:
   push:
     branches: [main]
     paths:
       - "products.json"
+      - "category_registry.json"
       - "build_feed.py"
       - "preflight.py"
-      - "category_registry.json"
+      - "verify_feed.py"
+      - "test_feed.py"
+      - "index.html"
+      - "images/**"
       - ".github/workflows/build-feed.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: bazar-feed-main
+  group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build-and-commit:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-      - uses: actions/setup-python@v5
+      - name: Checkout approved inventory
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Inspect publishing readiness (never publishes drafts)
+      - name: Run catalog safety tests
+        run: python -m unittest -v test_feed.py
+      - name: Validate approved inventory
         run: python preflight.py
-      - name: Generate feed only for approved products
+      - name: Generate approved XML
+        run: python build_feed.py
+      - name: Validate XML and original JPEG assets
+        run: python verify_feed.py
+      - name: Prepare public site only
         run: |
-          set +e
-          python build_feed.py
-          result=$?
-          set -e
-          if [ "$result" -eq 2 ]; then
-            echo "No approved items; no feed published."
-            exit 0
-          fi
-          exit "$result"
-      - name: Commit regenerated feed (only if changed)
-        run: |
-          if [ ! -f feed.xml ]; then
-            echo "No feed.xml exists; skip."
-            exit 0
-          fi
-          if [ -z "$(git status --porcelain -- feed.xml)" ]; then
-            echo "Feed unchanged."
-            exit 0
-          fi
-          git config user.name "bazar-ai-feed[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add feed.xml
-          git commit -m "Update approved Bazar.bg feed"
-          git push
+          mkdir -p _site
+          cp index.html feed.xml .nojekyll _site/
+          cp -R images _site/images
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload public site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_site"
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy verified product feed to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
