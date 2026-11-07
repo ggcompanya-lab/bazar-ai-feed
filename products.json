@@ -15,7 +15,6 @@
         "https://ggcompanya-lab.github.io/bazar-ai-feed/images/SAS-JACKET-001/03-closure.jpg",
         "https://ggcompanya-lab.github.io/bazar-ai-feed/images/SAS-JACKET-001/04-tag.jpg"
       ],
-      "notes_internal": "Потребителят даде изрично „качвай“ на 07.11.2026 за SAS-JACKET-001 на 39.90 EUR с четирите оригинални снимки. Техническият статус остава draft до проверка в Bazar.bg. Публичният каталог на Bazar.bg потвърждава категория 311, вид 215 (Зимни), размер L и състояние 1 (Ново). Изчаква проверка в „Формат и полета“ за XML представянето на няколко снимки, останалите полета и автоматичното попълване на данни от профила.\n07.11.2026: Изрично одобрение от продавача 'качвай' след преглед на обявата за 39.90 €. Публикуването е блокирано от липсата на публични снимки, окончателно проверени XML полета и активен Bazar импорт. Не маркирай live без Bazar потвърждение.\n07.11.2026: Конфигурирано за генериране на XML с всички 4 вече качени JPEG снимки. Форматът на множество images с | и някои категории/контактни полета подлежат на еднократно валидиране в Bazar импорта. НЯМА ПОТВЪРДЕНА АКТИВНА ОБЯВА.",
       "currency": "EUR",
       "product_type": "mens_winter_coat",
       "condition_text": "Ново, неносено, с оригинален висящ етикет",
@@ -26,9 +25,8 @@
       "sizes": "L",
       "condition": "1",
       "seller_approved": true,
-      "seller_approval_text": "качвай",
       "seller_approved_at": "2026-11-07",
-      "delivery_state": "feed_generation_requested_not_yet_imported_by_bazar",
+      "delivery_state": "feed_prepared_awaiting_bazar_import",
       "price_type": "1",
       "allow_offers": "0"
     }
