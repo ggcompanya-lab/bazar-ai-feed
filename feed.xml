@@ -6,13 +6,21 @@
       <title>Ново мъжко зимно яке Saint + Sinner, размер L, с етикет</title>
       <description>Продавам чисто ново, неносено мъжко зимно яке Saint + Sinner, размер L, с оригинален етикет. Дълъг ватиран модел в маслиненозелено с черни акценти. Качулка с регулиращи връзки, висока яка, предно закопчаване с цип и тик-так копчета, два вертикални джоба с цип на гърдите и предни джобове с капаци. Снимките показват реалния артикул. При интерес мога да предоставя допълнителни снимки и размери. Доставката е за сметка на купувача, ако не е уговорено друго.</description>
       <category_id>311</category_id>
+      <province_id />
+      <city_id />
+      <district_id />
+      <phone />
       <images>https://ggcompanya-lab.github.io/bazar-ai-feed/images/SAS-JACKET-001/01-front.jpg|https://ggcompanya-lab.github.io/bazar-ai-feed/images/SAS-JACKET-001/02-back.jpg|https://ggcompanya-lab.github.io/bazar-ai-feed/images/SAS-JACKET-001/03-closure.jpg|https://ggcompanya-lab.github.io/bazar-ai-feed/images/SAS-JACKET-001/04-tag.jpg</images>
+      <video />
       <type>215</type>
       <sizes>L</sizes>
       <condition>1</condition>
+      <delivery />
       <price>39.90</price>
       <price_type>1</price_type>
       <allow_offers>0</allow_offers>
+      <hide_phone />
+      <auto_renew />
     </advert>
   </adverts>
 </data>
