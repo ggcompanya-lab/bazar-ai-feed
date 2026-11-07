@@ -71,12 +71,15 @@ def build():
     for p in approved:
         advert = ET.SubElement(adverts, "advert")
         for field in BASE_FIELDS:
-            value = p.get(field)
-            if value is None or value == "":
-                continue
+            value = p.get(field, "")
+            if value is None:
+                value = ""
             if field == "images":
-                # Provisional multi-image encoding; importer mapping to be verified once.
+                # Bazar category sample uses a single images element.
+                # Multiple URLs are joined as provisionally configured.
                 value = "|".join(value)
+            # Include every field in the Bazar example, including empty
+            # optional fields, so the importer can recognize all keys.
             ET.SubElement(advert, field).text = str(value)
         for field, value in p.get("extra_fields", {}).items():
             if value is not None and value != "":
