@@ -6,6 +6,8 @@ on:
     paths:
       - "products.json"
       - "build_feed.py"
+      - "preflight.py"
+      - "category_registry.json"
       - ".github/workflows/build-feed.yml"
   workflow_dispatch:
 
@@ -26,6 +28,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Inspect publishing readiness (never publishes drafts)
+        run: python preflight.py
       - name: Generate feed only for approved products
         run: |
           set +e
