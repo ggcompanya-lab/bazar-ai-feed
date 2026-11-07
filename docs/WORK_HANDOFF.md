@@ -1,22 +1,28 @@
-# Handoff to ChatGPT Work — finish Bazar.bg integration
+# Work handoff — довърши Bazar.bg интеграцията еднократно
 
-## Current truth
-- Public GitHub Pages is active: https://ggcompanya-lab.github.io/bazar-ai-feed/
-- GitHub project: https://github.com/ggcompanya-lab/bazar-ai-feed
-- products.json contains a **draft** item `SAS-JACKET-001`, Saint + Sinner, new/unused with tag, mens size L, **39.90 EUR**, Bazar category **311**.
-- Seller has explicitly said: **do not publish until "Качвай".** No such command has been issued.
-- `feed.xml` intentionally does not exist yet. Do not configure Bazar importer with missing URL.
-- Basic workflow auto-runs `preflight.py`, then attempts `build_feed.py` only when approved items exist.
+## За какво е проектът
+Система за публикуване на всякакви продукти в **Bazar.bg**. Потребителят изпраща снимките в ChatGPT, преглежда цена и описание, казва „Качвай“. Одобрението важи само за тази обява. AI качва файловете, попълва каталога и синхронизира feed. Bazar.bg чете един и същи XML URL.
 
-## Work actions to complete with authorized browser access
-1. Open the user's signed-in Bazar account, `https://bazar.bg/user/import`. If not signed in, ask the user to sign in themselves; do not request passwords in chat.
-2. Open 'Формат и полета', choose category 311, inspect exact XML specs. Verify whether 311 is indeed the chosen men's jacket category and specific requirements for `sizes=L`, `condition`, `type`, `delivery`, `price_type`, `allow_offers`, and `images` separators. Update `category_registry.json` to `verified` **only after checking**.
-3. Determine user's seller contact/location **from Bazar profile**, without sharing it in chat or committing non-public details to a public repository. Where Bazar allows profile fallbacks, omit fields from feed.
-4. Take the FOUR original jacket photos from this conversation / supplied files (not synthetic product images). Host them on stable public HTTPS URLs approved by the seller, preferably the existing GitHub Pages repository under `images/SAS-JACKET-001/`. Use file upload through computer browser if connector cannot write binary. Verify URLs return actual JPEG images.
-5. Update draft product with verified field names and URLs. Validate `build_feed.py` with a safe local dry run and XML parser; update generator's photo format if Bazar requires another format.
-6. Do not mark product `approved` or create live `feed.xml` until user's explicit, specific "Качвай" after seeing the final listing. Read the latest draft before applying any approval.
-7. Once approved, generate/verify public feed URL. In Bazar user/import add one automatic feed. Map categories, finalize import. Only claim live publication once the listing is confirmed live in Bazar; a GitHub commit alone is not Bazar publication.
-8. Check whether Premium is active before proceeding, and do not buy a plan without the user's express authorization. Do not submit payments or set up automatic paid renewal without consent.
+## Вече работещи технически части
+- GitHub repo: https://github.com/ggcompanya-lab/bazar-ai-feed
+- GitHub Pages / XML: https://ggcompanya-lab.github.io/bazar-ai-feed/feed.xml
+- GitHub Actions: https://github.com/ggcompanya-lab/bazar-ai-feed/actions/workflows/build-feed.yml
+- WordPress.com медийна библиотека за снимки: blog ID `258510069`, сайт `https://bazaraiphotos.wordpress.com`. Оригинална снимка бе качена директно от ChatGPT и публичният URL беше проверен в GitHub Actions.
+- WordPress MCP action `wpcom_media_create` приема `file` за снимка от чата и връща `source_url`. Използвай този URL в нов продукт; не пази API ключове.
+- За нова обява се променя `products.json`, GitHub Actions валидира `preflight.py`, `test_feed.py`, `build_feed.py`, `verify_feed.py`, после директно публикува Pages чрез artifact. Няма необходимост от повторно създаване на feed.
+- Първи продукт: `SAS-JACKET-001`, Saint + Sinner, размер L, ново с етикет, цена 39.90 €, категория 311, 4 реални снимки в `images/SAS-JACKET-001`. `status=approved_pending_import`: НЕ е потвърдено, че е публикувано в Bazar.bg.
 
-## Important caution
-Bazar sync is periodic, not instantaneous. AI assistant may prepare code and approved feed directly from GitHub connector; authenticated Bazar UI interaction must happen in Work/Computer Use. All operations must remain scoped to Bazar.bg.
+## Единствени оставащи задачи в браузъра
+1. **GitHub Settings → Pages → Build and deployment → Source: GitHub Actions.** Това прекратява конкуриращото се старо публикуване от main branch. Новият GitHub Actions workflow вече е дал успешен deployment, но GitHub продължава да показва и `pages build and deployment` за branch pushes. Потвърди от Pages, че именно GitHub Actions е текущият Source.
+2. Влез в потребителския профил на Bazar.bg (потребителят влиза лично, не събирай парола в чат).
+3. `https://bazar.bg/user/import` → Автоматичен feed → Нов feed. Постави `https://ggcompanya-lab.github.io/bazar-ai-feed/feed.xml`. Анализирай и съпостави категория 311; разреши еднократно импорт след проверка на всички полета. Провери изискванията за `images` (четири URL, разделени с `|`), `type=215`, `sizes=L`, `condition=1`, `price_type`, `allow_offers`, адрес/телефон по профил. Ако някое поле се отхвърли, коригирай XML генератора в GitHub, без да сменяш постоянния URL.
+4. Установи активен Premium/Premium Plus; **не купувай без изрично съгласие**.
+5. Стартирай импорт. Следи историята и създадената обява, потвърди реалния Bazar URL. Едва след успешен импорт и видим резултат можеш да смениш `status` на `live`.
+
+## Правила за безопасност
+- Не публикувай чернови (`status=draft`), не твърди „Публикувано“ само по GitHub upload.
+- Използвай реалните снимки на артикула, не AI-измислени детайли.
+- Никога не записвай пароли, лични чатове, непубликувани клиентски данни и телефон в публичен GitHub.
+- Пазѝ `external_id` постоянен, за да не се дублират обяви при обновяване.
+- Bazar обновява периодично, не моментално; провери резултата в историята.
+- При промяна на цена или състояние се консултирай със собственика, ако не са предварително разрешени.
