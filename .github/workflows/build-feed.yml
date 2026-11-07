@@ -1,0 +1,54 @@
+name: Build approved Bazar.bg feed
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "products.json"
+      - "build_feed.py"
+      - ".github/workflows/build-feed.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bazar-feed-main
+  cancel-in-progress: false
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate feed only for approved products
+        run: |
+          set +e
+          python build_feed.py
+          result=$?
+          set -e
+          if [ "$result" -eq 2 ]; then
+            echo "No approved items; no feed published."
+            exit 0
+          fi
+          exit "$result"
+      - name: Commit regenerated feed (only if changed)
+        run: |
+          if [ ! -f feed.xml ]; then
+            echo "No feed.xml exists; skip."
+            exit 0
+          fi
+          if [ -z "$(git status --porcelain -- feed.xml)" ]; then
+            echo "Feed unchanged."
+            exit 0
+          fi
+          git config user.name "bazar-ai-feed[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add feed.xml
+          git commit -m "Update approved Bazar.bg feed"
+          git push
