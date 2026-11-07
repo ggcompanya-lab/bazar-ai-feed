@@ -15,6 +15,20 @@ WP_HOST = "bazaraiphotos.wordpress.com"
 WP_PREFIX = "/wp-content/uploads/"
 
 
+def image_format(head):
+    if head.startswith(b"\xff\xd8\xff"):
+        return "JPEG"
+    if head.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "PNG"
+    if head[:6] in (b"GIF87a", b"GIF89a"):
+        return "GIF"
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+        return "WEBP"
+    if head[4:8] == b"ftyp" and head[8:12] in (b"heic", b"heix", b"mif1", b"hevc", b"heis"):
+        return "HEIC"
+    return None
+
+
 def check_photo(url, sku):
     u = urlparse(url)
     if u.scheme != "https" or u.username or u.password or u.query or u.fragment:
@@ -27,15 +41,15 @@ def check_photo(url, sku):
         if not 0 < f.stat().st_size <= 50 * 1024 * 1024:
             raise ValueError(f"{sku}: invalid file size: {relative}")
         with f.open("rb") as src:
-            if src.read(3) != b"\xff\xd8\xff":
-                raise ValueError(f"{sku}: bad JPEG bytes: {relative}")
+            if not image_format(src.read(16)):
+                raise ValueError(f"{sku}: invalid image bytes: {relative}")
     elif u.netloc == WP_HOST and u.path.startswith(WP_PREFIX):
         request = Request(url, headers={"User-Agent": "BazarAIFeed/1.0"})
         with urlopen(request, timeout=20) as response:
             if response.status != 200 or not response.headers.get("Content-Type", "").startswith("image/"):
                 raise ValueError(f"{sku}: external image is not reachable")
-            if response.read(3) != b"\xff\xd8\xff":
-                raise ValueError(f"{sku}: external image is not a JPEG")
+            if not image_format(response.read(16)):
+                raise ValueError(f"{sku}: external image is not a supported photo")
     else:
         raise ValueError(f"{sku}: image origin not approved: {u.netloc}")
 
@@ -62,7 +76,7 @@ def main():
             raise ValueError(f"{sku}: photo URLs not in sync")
         for url in images:
             check_photo(url, sku)
-        print(f"{sku}: verified {len(images)} JPEG images and XML record")
+        print(f"{sku}: verified {len(images)} image files and XML record")
     print("All approved XML records validated; Bazar acceptance is still separate.")
     return 0
 
