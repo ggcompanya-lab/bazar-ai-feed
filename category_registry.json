@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "platform": "bazar.bg",
+  "category_policy": "Remember mappings after initial validation; never infer numeric IDs or code values.",
+  "mappings": {
+    "311": {
+      "category_id": "311",
+      "source": "Official category number supplied by seller and Bazar.bg sample bazar-import-311.xml",
+      "description": "Category used for Saint + Sinner men's winter coat listing",
+      "example_fields": [
+        "external_id",
+        "title",
+        "description",
+        "category_id",
+        "province_id",
+        "city_id",
+        "district_id",
+        "phone",
+        "images",
+        "video",
+        "type",
+        "sizes",
+        "condition",
+        "delivery",
+        "price",
+        "price_type",
+        "allow_offers",
+        "hide_phone",
+        "auto_renew"
+      ],
+      "known_input_format": {
+        "sizes": "Text label(s), e.g. XS|S in example; size L still needs category validation",
+        "province_id": "Location name accepted by platform according to Bazar import UI",
+        "city_id": "Location name accepted by platform according to Bazar import UI"
+      },
+      "verification_status": "partial",
+      "pending_checks": [
+        "Correct allowed value for type",
+        "Whether condition=1 means new",
+        "Photo XML structure for multiple URLs",
+        "Seller profile contact/location fallback",
+        "Import validation on Bazar.bg"
+      ]
+    }
+  }
+}
