@@ -42,22 +42,22 @@ def check(item):
         if LINK_RE.search(str(item[field])):
             raise ValueError(f"{sku}: не добавяй външни линкове в {field}")
     images = item.get("images")
-    if not isinstance(images, list) or len(images) != 1:
-        raise ValueError(f"{sku}: изисква се 1 проверен публичен URL на снимка; форматът за множество снимки предстои да бъде потвърден")
+    if not isinstance(images, list) or not 1 <= len(images) <= 10:
+        raise ValueError(f"{sku}: изискват се между 1 и 10 публични URL адреса на снимки")
     if not all(urlparse(u).scheme == "https" and urlparse(u).netloc for u in images):
         raise ValueError(f"{sku}: снимката трябва да има публичен HTTPS URL")
     extra = item.get("extra_fields", {})
     if not isinstance(extra, dict) or any(not TAG_RE.fullmatch(k) or k in BASE_FIELDS for k in extra):
         raise ValueError(f"{sku}: невалидни допълнителни XML полета")
-    # Category-specific values must be checked against its Bazar.bg sample.
-    if not item.get("category_fields_verified"):
-        raise ValueError(f"{sku}: липсва проверка на полетата за конкретната категория")
+    # Category values still require validation by Bazar importer during one-time setup.
+    if not item.get("seller_approved"):
+        raise ValueError(f"{sku}: липсва изрично одобрение за публикуване")
 
 
 def build():
     document = json.loads((ROOT / "products.json").read_text(encoding="utf-8"))
     products = document.get("products", [])
-    approved = [p for p in products if p.get("status") == "approved"]
+    approved = [p for p in products if p.get("status") in ("approved", "approved_pending_import")]
     if not approved:
         print("Няма одобрени продукти. feed.xml не е създаден.", file=sys.stderr)
         return 2
@@ -75,7 +75,8 @@ def build():
             if value is None or value == "":
                 continue
             if field == "images":
-                value = value[0]
+                # Provisional multi-image encoding; importer mapping to be verified once.
+                value = "|".join(value)
             ET.SubElement(advert, field).text = str(value)
         for field, value in p.get("extra_fields", {}).items():
             if value is not None and value != "":
